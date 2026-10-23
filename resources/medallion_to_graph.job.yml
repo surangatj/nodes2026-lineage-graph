@@ -1,0 +1,36 @@
+resources:
+  jobs:
+    bakehouse_medallion_to_graph:
+      name: bakehouse_medallion_to_graph
+      description: >
+        Builds a small Bakehouse medallion (bronze -> silver -> gold) so Unity Catalog
+        captures lineage, then publishes system.access lineage as a knowledge graph in Neo4j.
+      tags:
+        project: nodes2026
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: lookback_days
+          default: "30"
+      tasks:
+        - task_key: bronze
+          notebook_task:
+            notebook_path: ../src/01_bronze.sql
+
+        - task_key: silver
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: ../src/02_silver.sql
+
+        - task_key: gold
+          depends_on:
+            - task_key: silver
+          notebook_task:
+            notebook_path: ../src/03_gold.sql
+
+        - task_key: publish_lineage_graph
+          depends_on:
+            - task_key: gold
+          notebook_task:
+            notebook_path: ../src/04_publish_lineage_graph.py

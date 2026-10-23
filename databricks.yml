@@ -1,0 +1,15 @@
+bundle:
+  name: nodes2026_lineage_graph
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for the demo medallion schemas (override with --var catalog=<name>)
+    default: main
+
+targets:
+  dev:
+    mode: development
+    default: true
